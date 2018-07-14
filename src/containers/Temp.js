@@ -56,6 +56,8 @@ const TablePage = () => {
           <TableHeader>
             <TableRow>
               <TableHeaderColumn style={styles.columns.id}>ID</TableHeaderColumn>
+              <TableHeaderColumn style={styles.columns.name}>Name</TableHeaderColumn>
+              <TableHeaderColumn style={styles.columns.price}>Price</TableHeaderColumn>
               <TableHeaderColumn style={styles.columns.category}>Category</TableHeaderColumn>
               <TableHeaderColumn style={styles.columns.edit}>Edit</TableHeaderColumn>
             </TableRow>
@@ -86,3 +88,4 @@ const TablePage = () => {
   );
 };
 
+export default TablePage;

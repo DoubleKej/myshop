@@ -3,32 +3,37 @@ import { Link } from 'react-router';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Dialog from 'material-ui/Dialog';
-import DialogTitle from 'material-ui/Dialog';
-import DialogContent from 'material-ui/Dialog';
-import DialogContentText from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import DialogActions from 'material-ui/Dialog';
-import Button from 'material-ui/FlatButton';
-
+import FlatButton from 'material-ui/FlatButton';
 import ContentCreate from 'material-ui/svg-icons/content/create';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import { pink500, grey200, grey500 } from 'material-ui/styles/colors';
 import PageBase from '../components/PageBase';
 import axios from 'axios';
+import { stringify } from 'querystring';
 
 
 class Category extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      listCategory: []
+      listCategory: [],
+      open: false,
+      currentId: '',
+      nameValue: '',
+      desValue: ''
     }
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleOpen = this.handleOpen.bind(this)
+    this.handleChangeName = this.handleChangeName.bind(this);
+    this.handleChangeDes = this.handleChangeDes.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.getCurrentId = this.getCurrentId.bind(this);
 
   }
 
-  
+
   getCategory() {
     axios.get('http://localhost:8000/get/categories', {
       headers: {
@@ -62,6 +67,50 @@ class Category extends Component {
         console.log(error);
       });
   }
+  handleChangeName(event) {
+    this.setState({ nameValue: event.target.value });    // this.setState({ desValue: event.target.value });
+    
+  }
+  handleChangeDes(event) {
+    this.setState({ desValue: event.target.value });    // this.setState({ desValue: event.target.value });
+    
+  }
+  
+  handleEdit(_id) {
+    this.setState({ open: false });
+    console.log('input1:',this.state.nameValue)
+    console.log('input2:',this.state.desValue)
+
+    axios.put(`http://localhost:8000/put/categories/${_id}`, 
+        stringify({
+          categoryName: this.state.nameValue,
+          description: this.state.desValue
+        })
+  )
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+    event.preventDefault();
+  }
+  getCurrentId(_id) {
+    console.log('clicked ', _id);
+    this.setState({
+      currentId: _id,
+    })
+  }
+
+  handleOpen = (_id) => {
+    
+    this.setState({ open: true, currentId: _id});
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
 
   render() {
     // const { classes } = this.props;
@@ -93,6 +142,7 @@ class Category extends Component {
         }
       }
     };
+    console.log(this.state.open)
     return (
       <div>
         <PageBase title="Category Page"
@@ -122,14 +172,17 @@ class Category extends Component {
                     <TableRowColumn style={styles.columns.categoryName}>{item.categoryName}</TableRowColumn>
                     <TableRowColumn style={styles.columns.description}>{item.description}</TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
-                      <Link className="button" to="/editcategory">
-                        <FloatingActionButton zDepth={0}
-                          mini={true}
-                          backgroundColor={grey200}
-                          iconStyle={styles.editButton}>
-                          <ContentCreate />
-                        </FloatingActionButton>
-                      </Link>
+                      
+                      <FloatingActionButton
+                    
+                        onClick={() => { this.handleOpen(item._id) }}
+                        zDepth={0}
+                        mini={true}
+                        backgroundColor={grey200}
+                        iconStyle={styles.editButton}>
+                        <ContentCreate />
+                      </FloatingActionButton>
+                      
                     </TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
                       <FloatingActionButton className="button" zDepth={0}
@@ -145,35 +198,35 @@ class Category extends Component {
               </TableBody>
             </Table>
             <Dialog
-            open={this.state.open}
-            onClose={this.handleClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle id="form-dialog-title">Edit Dialog</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Lorem ipsum...
-            </DialogContentText>
+              open={this.state.open}
+              onClose={this.handleClose}
+              aria-labelledby="form-dialog-title"
+            >
+            
               <TextField
-                valueEdit={this.state.valueEdit}
-                onChange={this.handleChangeEdit}
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Edit this task"
-                type="email"
-                fullWidth
+                hintText="Name"
+                floatingLabelText="Name"
+                fullWidth={true}
+                value={this.state.nameValue}
+                onChange={(e) => { this.handleChangeName(e, 'name') }}
               />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.handleClose} color="primary">
+              <TextField
+                hintText="Description"
+                floatingLabelText="Description"
+                fullWidth={true}
+                value={this.state.desValue}
+                onChange={this.handleChangeDes}
+              />
+
+
+              <FlatButton style={{float: 'right'}} onClick={this.handleClose}>
                 Cancel
-            </Button>
-              <Button onClick={() => { this.handleEdit(this.state.currentId)}} color="primary">
+            </FlatButton>
+              <FlatButton style={{float: 'right'}} onClick={() => { this.handleEdit(this.state.currentId) }} color="primary">
                 Subscribe
-            </Button>
-            </DialogActions>
-          </Dialog>
+            </FlatButton>
+
+            </Dialog>
           </div>
         </PageBase>
 
