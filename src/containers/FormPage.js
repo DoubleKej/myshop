@@ -42,15 +42,6 @@ const FormPage = () => {
           fullWidth={true}
         />
 
-        <SelectField
-          floatingLabelText="City"
-          value=""
-          fullWidth={true}>
-          <MenuItem key={0} primaryText="London"/>
-          <MenuItem key={1} primaryText="Paris"/>
-          <MenuItem key={2} primaryText="Rome"/>
-        </SelectField>
-
         <DatePicker
           hintText="Expiration Date"
           floatingLabelText="Expiration Date"
