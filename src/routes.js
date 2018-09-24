@@ -4,9 +4,10 @@ import App from './containers/App';
 import NotFoundPage from './containers/NotFoundPage.js';
 import LoginPage from './containers/LoginPage';
 import AddCategoryPage from './containers/AddCategoryPage';
-import EditCategoryPage from './containers/EditCategoryPage';
 import CategoryPage from './containers/CategoryPage';
+import ProductPage from './containers/ProductPage';
 import Dashboard from './containers/DashboardPage';
+import AddProductPage from './containers/AddProductPage';
 
 export default (
   <Route>
@@ -15,8 +16,9 @@ export default (
       <IndexRoute component={Dashboard}/>
       <Route path="dashboard" component={Dashboard}/>
       <Route path="addcategory" component={AddCategoryPage}/>
-      <Route path="editcategory" component={EditCategoryPage}/>
       <Route path="category" component={CategoryPage}/>
+      <Route path="product" component={ProductPage}/>
+      <Route path="addproduct" component={AddProductPage}/>
       <Route path="*" component={NotFoundPage}/>
     </Route>
   </Route>

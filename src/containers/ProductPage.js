@@ -3,34 +3,39 @@ import { Link } from 'react-router';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Dialog from 'material-ui/Dialog';
-import DialogTitle from 'material-ui/Dialog';
-import DialogContent from 'material-ui/Dialog';
-import DialogContentText from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import DialogActions from 'material-ui/Dialog';
-import Button from 'material-ui/FlatButton';
-
+import FlatButton from 'material-ui/FlatButton';
 import ContentCreate from 'material-ui/svg-icons/content/create';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import { pink500, grey200, grey500 } from 'material-ui/styles/colors';
 import PageBase from '../components/PageBase';
 import axios from 'axios';
+import { stringify } from 'querystring';
 
 
-class Category extends Component {
+class Product extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      listCategory: []
+      listProduct: [],
+      open: false,
+      currentId: '',
+      nameValue: '',
+      desValue: ''
     }
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleOpen = this.handleOpen.bind(this)
+    this.handleChangeName = this.handleChangeName.bind(this);
+    this.handleChangeDes = this.handleChangeDes.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.getCurrentId = this.getCurrentId.bind(this);
 
   }
 
-  
-  getCategory() {
-    axios.get('http://localhost:8000/get/categories', {
+
+  getProduct() {
+    axios.get('http://localhost:8000/get/products', {
       headers: {
         'Access-Control-Allow-Origin': '*',
       }
@@ -38,7 +43,7 @@ class Category extends Component {
       .then((response) => {
         console.log('response:', response);
         this.setState({
-          listCategory: response.data.data
+          listProduct: response.data.data
         })
       })
       .catch(function (error) {
@@ -47,14 +52,14 @@ class Category extends Component {
   }
   componentDidMount() {
     console.log("function had been run!")
-    this.getCategory();
+    this.getProduct();
   }
 
   handleDelete(_id) {
     console.log(_id)
-    axios.delete(`http://localhost:8000/delete/categories/${_id}`)
+    axios.delete(`http://localhost:8000/delete/products/${_id}`)
       .then(res => {
-        this.getCategory();
+        this.getProduct();
         console.log(res)
         console.log('it works')
       })
@@ -62,6 +67,49 @@ class Category extends Component {
         console.log(error);
       });
   }
+  handleChangeName(event) {
+    this.setState({ nameValue: event.target.value });    // this.setState({ desValue: event.target.value });
+
+  }
+  handleChangeDes(event) {
+    this.setState({ desValue: event.target.value });    // this.setState({ desValue: event.target.value });
+
+  }
+
+  handleEdit(_id) {
+    this.setState({ open: false });
+    console.log('input1:', this.state.nameValue)
+    console.log('input2:', this.state.desValue)
+
+    axios.put(`http://localhost:8000/put/products/${_id}`,
+      stringify({
+        productName: this.state.nameValue,
+        description: this.state.desValue
+      })
+    )
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    event.preventDefault();
+  }
+  getCurrentId(_id) {
+    console.log('clicked ', _id);
+    this.setState({
+      currentId: _id,
+    })
+  }
+
+  handleOpen = (_id) => {
+    this.setState({ open: true, currentId: _id });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
 
   render() {
     // const { classes } = this.props;
@@ -81,7 +129,7 @@ class Category extends Component {
         id: {
           width: '10%'
         },
-        category: {
+        product: {
           width: '30%'
         },
         description: {
@@ -93,13 +141,14 @@ class Category extends Component {
         }
       }
     };
+    console.log(this.state.open)
     return (
       <div>
-        <PageBase title="Category Page"
-          navigation="Category Page">
+        <PageBase title="Product Page"
+          navigation="Product Page">
 
           <div>
-            <Link to="/addcategory" >
+            <Link to="/addproduct" >
               <FloatingActionButton style={styles.floatingActionButton} backgroundColor={pink500}>
                 <ContentAdd />
               </FloatingActionButton>
@@ -109,27 +158,30 @@ class Category extends Component {
               <TableHeader>
                 <TableRow>
                   <TableHeaderColumn style={styles.columns.id}>ID</TableHeaderColumn>
-                  <TableHeaderColumn style={styles.columns.category}>Cate gory</TableHeaderColumn>
+                  <TableHeaderColumn style={styles.columns.product}>Cate gory</TableHeaderColumn>
                   <TableHeaderColumn style={styles.columns.description}>Description</TableHeaderColumn>
                   <TableHeaderColumn style={styles.columns.edit}>Edit</TableHeaderColumn>
                   <TableHeaderColumn style={styles.columns.edit}>Del</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {this.state.listCategory.map(item =>
+                {this.state.listProduct.map(item =>
                   <TableRow key={item._id}>
                     <TableRowColumn style={styles.columns.id}>{item._id}</TableRowColumn>
-                    <TableRowColumn style={styles.columns.categoryName}>{item.categoryName}</TableRowColumn>
+                    <TableRowColumn style={styles.columns.productName}>{item.productName}</TableRowColumn>
                     <TableRowColumn style={styles.columns.description}>{item.description}</TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
-                      <Link className="button" to="/editcategory">
-                        <FloatingActionButton zDepth={0}
-                          mini={true}
-                          backgroundColor={grey200}
-                          iconStyle={styles.editButton}>
-                          <ContentCreate />
-                        </FloatingActionButton>
-                      </Link>
+
+                      <FloatingActionButton
+
+                        onClick={() => { this.handleOpen(item._id) }}
+                        zDepth={0}
+                        mini={true}
+                        backgroundColor={grey200}
+                        iconStyle={styles.editButton}>
+                        <ContentCreate />
+                      </FloatingActionButton>
+
                     </TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
                       <FloatingActionButton className="button" zDepth={0}
@@ -145,35 +197,35 @@ class Category extends Component {
               </TableBody>
             </Table>
             <Dialog
-            open={this.state.open}
-            onClose={this.handleClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle id="form-dialog-title">Edit Dialog</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Lorem ipsum...
-            </DialogContentText>
+              open={this.state.open}
+              onClose={this.handleClose}
+              aria-labelledby="form-dialog-title"
+            >
+
               <TextField
-                valueEdit={this.state.valueEdit}
-                onChange={this.handleChangeEdit}
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Edit this task"
-                type="email"
-                fullWidth
+                hintText="Name"
+                floatingLabelText="Name"
+                fullWidth={true}
+                value={this.state.nameValue}
+                onChange={(e) => { this.handleChangeName(e, 'name') }}
               />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.handleClose} color="primary">
+              <TextField
+                hintText="Description"
+                floatingLabelText="Description"
+                fullWidth={true}
+                value={this.state.desValue}
+                onChange={this.handleChangeDes}
+              />
+
+
+              <FlatButton style={{ float: 'right' }} onClick={this.handleClose}>
                 Cancel
-            </Button>
-              <Button onClick={() => { this.handleEdit(this.state.currentId)}} color="primary">
+            </FlatButton>
+              <FlatButton style={{ float: 'right' }} onClick={() => { this.handleEdit(this.state.currentId) }} color="primary">
                 Subscribe
-            </Button>
-            </DialogActions>
-          </Dialog>
+            </FlatButton>
+
+            </Dialog>
           </div>
         </PageBase>
 
@@ -182,7 +234,7 @@ class Category extends Component {
   }
 }
 
-export default Category;
+export default Product;
 
 
 // import React from 'react';
@@ -194,9 +246,9 @@ export default Category;
 // import {pink500, grey200, grey500} from 'material-ui/styles/colors';
 // import PageBase from '../components/PageBase';
 // // import Data from '../data';
-// import {getCategory} from '../Category';
+// import {getProduct} from '../Product';
 
-// const CategoryPage = () => {
+// const ProductPage = () => {
 
 //   const styles = {
 //     floatingActionButton: {
@@ -214,7 +266,7 @@ export default Category;
 //       id: {
 //         width: '10%'
 //       },
-//       category: {
+//       product: {
 //         width: '50%'
 //       },
 //       description: {
@@ -228,8 +280,8 @@ export default Category;
 //   };
 
 //   return (
-//     <PageBase title="Category Page"
-//               navigation="Application / Category Page">
+//     <PageBase title="Product Page"
+//               navigation="Application / Product Page">
 
 //       <div>
 //         <Link to="/form" >
@@ -242,16 +294,16 @@ export default Category;
 //           <TableHeader>
 //             <TableRow>
 //               <TableHeaderColumn style={styles.columns.id}>ID</TableHeaderColumn>
-//               <TableHeaderColumn style={styles.columns.category}>Cate gory</TableHeaderColumn>
+//               <TableHeaderColumn style={styles.columns.product}>Cate gory</TableHeaderColumn>
 //               <TableHeaderColumn style={styles.columns.description}>Description</TableHeaderColumn>
 //               <TableHeaderColumn style={styles.columns.edit}>Edit</TableHeaderColumn>
 //             </TableRow>
 //           </TableHeader>
 //           <TableBody>
-//             {getCategory().map(item =>
+//             {getProduct().map(item =>
 //               <TableRow key={item.id}>
 //                 <TableRowColumn style={styles.columns.id}>{item.id}</TableRowColumn>
-//                 <TableRowColumn style={styles.columns.category}>{item.category}</TableRowColumn>
+//                 <TableRowColumn style={styles.columns.product}>{item.product}</TableRowColumn>
 //                 <TableRowColumn style={styles.columns.description}>{item.description}</TableRowColumn>
 //                 <TableRowColumn style={styles.columns.edit}>
 //                   <Link className="button" to="/form">
@@ -272,5 +324,5 @@ export default Category;
 //   );
 // };
 
-// export default CategoryPage;
+// export default ProductPage;
 

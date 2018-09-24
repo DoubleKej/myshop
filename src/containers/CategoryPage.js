@@ -8,11 +8,32 @@ import FlatButton from 'material-ui/FlatButton';
 import ContentCreate from 'material-ui/svg-icons/content/create';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Icon from '@material-ui/core/Icon';
+import { withStyles } from '@material-ui/core/styles';
+
+
 import { pink500, grey200, grey500 } from 'material-ui/styles/colors';
 import PageBase from '../components/PageBase';
 import axios from 'axios';
 import { stringify } from 'querystring';
 
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
+  icon: {
+    margin: theme.spacing.unit * 2,
+  },
+  iconHover: {
+    margin: theme.spacing.unit * 2,
+    '&:hover': {
+      color: red[800],
+    },
+  },
+});
 
 class Category extends Component {
   constructor(props) {
@@ -32,7 +53,7 @@ class Category extends Component {
     this.getCurrentId = this.getCurrentId.bind(this);
 
   }
-
+  // const { classes } = props;
 
   getCategory() {
     axios.get('http://localhost:8000/get/categories', {
@@ -69,31 +90,32 @@ class Category extends Component {
   }
   handleChangeName(event) {
     this.setState({ nameValue: event.target.value });    // this.setState({ desValue: event.target.value });
-    
+
   }
   handleChangeDes(event) {
     this.setState({ desValue: event.target.value });    // this.setState({ desValue: event.target.value });
-    
+
   }
-  
+
   handleEdit(_id) {
     this.setState({ open: false });
-    console.log('input1:',this.state.nameValue)
-    console.log('input2:',this.state.desValue)
+    console.log('input1:', this.state.nameValue)
+    console.log('input2:', this.state.desValue)
 
-    axios.put(`http://localhost:8000/put/categories/${_id}`, 
-        stringify({
-          categoryName: this.state.nameValue,
-          description: this.state.desValue
-        })
-  )
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
+    axios.put(`http://localhost:8000/put/categories/${_id}`,
+      stringify({
+        categoryName: this.state.nameValue,
+        description: this.state.desValue
+      })
+    )
+    
+      .then(function (response) {
+        console.log(response);
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     event.preventDefault();
   }
   getCurrentId(_id) {
@@ -104,12 +126,15 @@ class Category extends Component {
   }
 
   handleOpen = (_id) => {
-    
-    this.setState({ open: true, currentId: _id});
+    this.setState({ open: true, currentId: _id });
   };
 
   handleClose = () => {
-    this.setState({ open: false });
+    this.setState({
+      nameValue:'',
+      desValue: '',
+      open: false
+    })
   };
 
   render() {
@@ -151,7 +176,9 @@ class Category extends Component {
           <div>
             <Link to="/addcategory" >
               <FloatingActionButton style={styles.floatingActionButton} backgroundColor={pink500}>
-                <ContentAdd />
+              <Icon className={classes.icon} color="primary">
+        add_circle
+      </Icon>
               </FloatingActionButton>
             </Link>
 
@@ -172,9 +199,9 @@ class Category extends Component {
                     <TableRowColumn style={styles.columns.categoryName}>{item.categoryName}</TableRowColumn>
                     <TableRowColumn style={styles.columns.description}>{item.description}</TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
-                      
+
                       <FloatingActionButton
-                    
+
                         onClick={() => { this.handleOpen(item._id) }}
                         zDepth={0}
                         mini={true}
@@ -182,7 +209,7 @@ class Category extends Component {
                         iconStyle={styles.editButton}>
                         <ContentCreate />
                       </FloatingActionButton>
-                      
+
                     </TableRowColumn>
                     <TableRowColumn style={styles.columns.edit}>
                       <FloatingActionButton className="button" zDepth={0}
@@ -202,7 +229,7 @@ class Category extends Component {
               onClose={this.handleClose}
               aria-labelledby="form-dialog-title"
             >
-            
+
               <TextField
                 hintText="Name"
                 floatingLabelText="Name"
@@ -219,10 +246,10 @@ class Category extends Component {
               />
 
 
-              <FlatButton style={{float: 'right'}} onClick={this.handleClose}>
+              <FlatButton style={{ float: 'right' }} onClick={this.handleClose}>
                 Cancel
             </FlatButton>
-              <FlatButton style={{float: 'right'}} onClick={() => { this.handleEdit(this.state.currentId) }} color="primary">
+              <FlatButton style={{ float: 'right' }} onClick={() => { this.handleEdit(this.state.currentId) }} color="primary">
                 Subscribe
             </FlatButton>
 

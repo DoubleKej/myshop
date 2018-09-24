@@ -15,13 +15,14 @@ import {browserHistory} from 'react-router';
 
 
 
-class AddCategoryPage extends Component {
+class AddProductPage extends Component {
 
   constructor(props){
     super(props);
     this.state = {
       nameValue: '',
-      desValue: ''
+      desValue: '',
+
     }
     this.handleChangeName = this.handleChangeName.bind(this);
     this.handleChangeDes = this.handleChangeDes.bind(this);
@@ -40,14 +41,14 @@ class AddCategoryPage extends Component {
   handleSubmit(event) {
     console.log('input1:',this.state.nameValue)
     console.log('input2:',this.state.desValue)
-    axios.post('http://localhost:8000/post/categories', stringify({
+    axios.post('http://localhost:8000/post/products', stringify({
       categoryName: this.state.nameValue,
       description: this.state.desValue
     })
   )
   
     .then(function (response) {
-      browserHistory.push('/category');
+      browserHistory.push('/product');
       console.log(response);
     })
     .catch(function (error) {
@@ -79,9 +80,9 @@ class AddCategoryPage extends Component {
     };
   
     return (
-      <PageBase title="Add Category Page"
-                navigation="Add Category Page">
-        <form action="/category" onSubmit={this.handleSubmit}>
+      <PageBase title="Add Product Page"
+                navigation="Add Product Page">
+        <form action="/product" onSubmit={this.handleSubmit}>
   
           <TextField
             hintText="Name"
@@ -98,10 +99,11 @@ class AddCategoryPage extends Component {
             onChange = {this.handleChangeDes}
           />
           
+          
           <Divider/>
   
           <div style={styles.buttons}>
-            <Link to="/category">
+            <Link to="/product">
               <RaisedButton label="Cancel"/>
             </Link>
   
@@ -119,4 +121,4 @@ class AddCategoryPage extends Component {
   }
 };
 
-export default AddCategoryPage;
+export default AddProductPage;
